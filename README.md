@@ -8,11 +8,13 @@ Valkyrie Savage, Harrison Goldstein, Nóra Püsök, Jia Yi Ren, Bhaskar Dutt, Ch
 
 To run the demos in this folder, install PIL and graphviz. The best example to look at first is demo_studies.py : this file has the samples that we shared with our user study participants. The file can be run with `python demo_studies.py` on the command line.
 
-To change which sample study is being run, edit the `if __name__ == '__main__'` block in the code, commenting out anything you do not wish to run, and uncommenting anything you do wish to run.
+To change which sample study is being run within a particular file, edit the `if __name__ == '__main__'` block in the code, commenting out anything you do not wish to run, and uncommenting anything you do wish to run.
 
 Calling a study with `render_flowchart(study_function)` will render a flowchart of the experiment. Calling a function bare as `study_function()` will render the flowchart XML to the commandline.
 
 Execute mode is triggered with `control.MODE = Execute()`.
+
+Each demo has two versions: one which has `_ours` in the title, and one which doesn't. These represent the uncorrected and corrected versions of the experiments from the different papers we analysed.
 
 ## dependencies
 
