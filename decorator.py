@@ -131,7 +131,7 @@ def fedt_experiment(f):
         result = new_f(*args, **kwargs)
         instructions = FlowChart().node
         FlowChart().reset()
-        date_and_time = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+        date_and_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         file_name = f"{date_and_time}-fedt-{f.__name__}.xml"
         print(f"Flowchart XML printed to {file_name}")
         with open(file_name, "w") as out_file:

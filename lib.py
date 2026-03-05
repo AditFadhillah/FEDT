@@ -231,19 +231,28 @@ class Laser(ConfigSoftware, ToolpathSoftware, FabricationDevice):
         instruction("ensure visicut is open")
 
         # make the svg into the .plf file that they like
-        temp_zf = 'spam.zip'
+        # Use unique filename to avoid conflicts when VisiCut keeps files open
+        import datetime
+        import random
+        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        temp_zf = f'visicut_{timestamp}_{random.randint(0,999)}.zip'
         with ZipFile(temp_zf, 'w') as myzip:
             myzip.write(line_file.file_location)
             myzip.write(mapping_file, "mappings.xml")
             myzip.write("transform.xml")
         temp_plf = temp_zf.replace('.zip','.plf')
+        if os.path.exists(temp_plf):
+            os.remove(temp_plf)
         os.rename(temp_zf, temp_plf)
-        cut_command = [VISICUT_LOCATION,
-                    #'--laserdevice \"' + Laser.default_laser_settings[Laser.LASERDEVICE] + '\"',
-                    '--execute',
-                    os.path.join(os.getcwd(), temp_plf)]
+        
+        cut_command = [VISICUT_LOCATION, '--execute', os.path.join(os.getcwd(), temp_plf)]
+        
         try:
             results = subprocess.check_output(cut_command, stderr=subprocess.STDOUT)
+        except FileNotFoundError:
+            print(f"ERROR: VisiCut not found at {VISICUT_LOCATION}")
+            print("Please install VisiCut or update VISICUT_LOCATION in config.py")
+            raise
         except subprocess.CalledProcessError as exc:
             # it probably didn't work! incredible. that's likely because we didn't get visicut in here right, or we're running offline.
             print("was not able to call visicut properly")
@@ -251,7 +260,11 @@ class Laser(ConfigSoftware, ToolpathSoftware, FabricationDevice):
             raise
         instruction("make sure your file doesn't overlap existing cuts")
         instruction("press 'execute', turn on extraction, and wait for the laser to complete its work")
-        os.remove(temp_plf)
+        try:
+            os.remove(temp_plf)
+        except PermissionError:
+            # VisiCut might still have the file open on Windows
+            print(f"Warning: Could not delete {temp_plf} - file may be in use by VisiCut")
         try:
             os.remove(temp_mapping_file)
         except:
@@ -425,7 +438,7 @@ class SvgEditor(DesignSoftware):
                 label_function(draw, d, label)
 
             if not os.path.exists(svg_location):
-                os.path.makedirs(svg_location)
+                os.makedirs(svg_location)
 
             svg_fname = "expt_{}.svg".format(label if label else datetime.datetime.now().strftime("%Y%m%d%H%M%S-{}").format(random.randint(0,100)))
             svg_fullpath = os.path.join(svg_location, svg_fname)

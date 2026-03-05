@@ -64,7 +64,10 @@ class BatchMeasurements:
         from control import MODE, Execute
         if isinstance(MODE, Execute):
             print("now it's time to get data!")
-            experiment_csv = os.path.join("expt_csvs","experiment-{}.csv".format(time.strftime("%Y%m%d-%H%M%S")))
+            csv_dir = "expt_csvs"
+            if not os.path.exists(csv_dir):
+                os.makedirs(csv_dir)
+            experiment_csv = os.path.join(csv_dir,"experiment-{}.csv".format(time.strftime("%Y%m%d-%H%M%S")))
 
             csv_to_obj = {}
             csv_to_meas = {}
